@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-misused-promises */
 /* eslint-disable no-shadow */
 /* eslint-disable max-len */
 /* eslint-disable no-console */
@@ -8,7 +7,7 @@ import pkg from 'pg';
 import cors from 'cors';
 
 const server = express();
-const port = process.env.PORT || 8080;
+const port = process.env.PORT || 5000;
 const { Client } = pkg;
 const client = new Client('postgres://qcewziyl:E4tFnzlQHFhd_aLwuFHfWGuH7fXPZGTk@trumpet.db.elephantsql.com/qcewziyl');
 

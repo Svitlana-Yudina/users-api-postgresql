@@ -1,0 +1,34 @@
+# docker-compose.yml
+version: "3.8"
+services:
+  app:
+    restart: always
+    build: .
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgres://qcewziyl:E4tFnzlQHFhd_aLwuFHfWGuH7fXPZGTk@trumpet.db.elephantsql.com/qcewziyl
+      NODE_ENV: development
+      DB_PORT: 5432
+      DB_HOST: db
+      DB_USER: qcewziyl
+      DB_PASSWORD: E4tFnzlQHFhd_aLwuFHfWGuH7fXPZGTk
+      DB_NAME: qcewziyl
+      PORT: 5000
+    links:
+      - db
+    ports:
+      - "5000:5000"
+    command: npm start
+    volumes:
+      - .:/app/
+      - /app/node_modules
+
+  db:
+    image: postgres:11
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: qcewziyl
+      POSTGRES_PASSWORD: E4tFnzlQHFhd_aLwuFHfWGuH7fXPZGTk
+      POSTGRES_DB: qcewziyl
