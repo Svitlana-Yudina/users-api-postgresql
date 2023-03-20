@@ -1,4 +1,3 @@
-/* eslint-disable no-shadow */
 /* eslint-disable max-len */
 /* eslint-disable no-console */
 import express from 'express';
@@ -20,12 +19,17 @@ server.use(express.json());
 server.get('/users', async(req, res) => {
   try {
     const usersToSend = await client.query(`
-      SELECT id, name, birth, email
-      FROM users
+    SELECT
+      users.username,
+      profiles.first_name,
+      profiles.last_name,
+      users.email,
+      users.role,
+      profiles.state
+    FROM users JOIN profiles
+    ON users.profile_id = profiles.id
     `);
-    const usersLength = usersToSend.rows.length;
 
-    res.setHeader('Content-Length', usersLength);
     res.send(usersToSend.rows);
   } catch (err) {
     res.send('Something went wrong:( We will fix this problem soon');
