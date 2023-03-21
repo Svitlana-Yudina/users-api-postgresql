@@ -5,20 +5,36 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400&display=swap" rel="stylesheet">
   <title>Document</title>
   <style>
     * {
       margin: 0;
       padding: 0;
+      box-sizing: border-box;
+      -webkit-box-sizing: border-box;
+      -moz-box-sizing: border-box;
+    }
+
+    html {
+      font-size: 3.125vw;
+      font-family: 'Roboto', sans-serif;
     }
 
     main {
       margin: 0 auto;
+      padding: 10px;
+
+      min-width: 320px;
+      width: 100%;
       max-width: 600px;
-      height: 100vh;
+
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
+      gap: 10px;
+
       background-color: rgb(247, 231, 211);
     }
 
@@ -35,22 +51,39 @@
 
     .conditions {
       display: flex;
-      flex-wrap: wrap;
+      flex-direction: column;
+      gap: 10px;
       align-items: stretch;
-      justify-content: space-around;
-      align-content:space-around;
       width: 100%;
       height: 88%;
     }
 
     .requests {
-      width: 45%;
       background-color: rgb(249, 243, 230);
+      border: 1px solid rgb(187, 175, 149);;
       border-radius: 8px;
     }
 
     .description {
       font-size: 14px;
+    }
+
+    @media (min-width: 480px) {
+      html {
+        font-size: 15px;
+      }
+
+      .conditions {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 0;
+        row-gap: 10px;
+        justify-content: space-around;
+      }
+
+      .requests {
+      width: 48%;
+      }
     }
   </style>
 </head>
