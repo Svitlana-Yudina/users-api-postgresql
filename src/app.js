@@ -65,6 +65,12 @@ server.get('/users', async(req, res) => {
 server.get('/users/:userId', async(req, res) => {
   try {
     const { userId } = req.params;
+    if (!Number(userId)) {
+      res.statusCode = 422;
+      res.send('UserId must be a number bigger than "0"');
+      return;
+    }
+
     const foundedUser = await client.query(`
       SELECT
         users.username,
@@ -88,7 +94,65 @@ server.get('/users/:userId', async(req, res) => {
   } catch (err) {
     res.send('Something went wrong:( We will fix this problem soon');
   }
-})
+});
+
+server.post('/users', async(req, res) => {
+  try {
+    const {
+      username,
+      first_name,
+      last_name,
+      email,
+      role,
+      state,
+    } = req.body;
+
+    if (!username
+      || !first_name
+      || !last_name
+      || !email
+      || (role !== 'user' && role !== 'admin')
+      || (state !== 'male' && state !== 'female')
+    ) {
+      res.sendStatus(422);
+
+      return;
+    }
+
+    const newProfile_id = await client.query(`
+      INSERT INTO public.profiles (
+      first_name, last_name, state
+      ) VALUES ($1, $2, $3)
+       returning id`, [first_name, last_name, state]);
+
+    const profile_id = newProfile_id.rows[0].id;
+
+    const newUserId = await client.query(`
+      INSERT INTO public.users (
+        username, email, role, profile_id
+      ) VALUES ($1, $2, $3, $4)
+      returning id`, [username, email, role, profile_id]
+    );
+
+    if (!Number(newUserId.rows[0].id)) {
+      res.sendStatus(422);
+      return;
+    }
+
+    res.statusCode = 201;
+      res.send({
+        username,
+        first_name,
+        last_name,
+        email,
+        role,
+        state
+      }
+    );
+  } catch (err) {
+    res.send('Something went wrong:( We will fix this problem soon');
+  }
+});
 
 server.listen(port, () => {
   console.log('server start on port', port);
