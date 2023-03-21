@@ -32,6 +32,7 @@ server.get('/users', async(req, res) => {
           profiles.state
         FROM users JOIN profiles
         ON users.profile_id = profiles.id
+        ORDER BY users.id
       `);
 
       res.send(allUsers.rows);
@@ -51,6 +52,7 @@ server.get('/users', async(req, res) => {
         FROM users JOIN profiles
         ON users.profile_id = profiles.id
         WHERE users.role = $1
+        ORDER BY users.id
       `, [role]);
 
       res.send(usersToSend.rows);
@@ -143,15 +145,22 @@ server.post('/users', async(req, res) => {
       return;
     }
 
+    const createdUser = await client.query(`
+      SELECT
+        users.id,
+        users.username,
+        profiles.first_name,
+        profiles.last_name,
+        users.email,
+        users.role,
+        profiles.state
+      FROM users JOIN profiles
+      ON users.profile_id = profiles.id
+      WHERE users.id = (SELECT MAX(id) FROM users)
+    `);
+
     res.statusCode = 201;
-    res.send({
-      username,
-      first_name,
-      last_name,
-      email,
-      role,
-      state
-    });
+    res.send(createdUser.rows);
   } catch (err) {
     res.send('Something went wrong:( We will fix this problem soon');
   }
