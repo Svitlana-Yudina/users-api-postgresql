@@ -23,6 +23,7 @@ server.get('/users', async(req, res) => {
     if (role === undefined) {
       const allUsers = await client.query(`
         SELECT
+          users.id,
           users.username,
           profiles.first_name,
           profiles.last_name,
@@ -40,6 +41,7 @@ server.get('/users', async(req, res) => {
     if (role === 'user' || role === 'admin') {
       const usersToSend = await client.query(`
         SELECT
+          users.id,
           users.username,
           profiles.first_name,
           profiles.last_name,
@@ -65,6 +67,7 @@ server.get('/users', async(req, res) => {
 server.get('/users/:userId', async(req, res) => {
   try {
     const { userId } = req.params;
+
     if (!Number(userId)) {
       res.statusCode = 422;
       res.send('UserId must be a number bigger than "0"');
@@ -153,6 +156,45 @@ server.post('/users', async(req, res) => {
     res.send('Something went wrong:( We will fix this problem soon');
   }
 });
+
+server.delete('/users/:userId', async(req, res) => {
+  try {
+    const { userId } = req.params;
+
+    if (!Number(userId)) {
+      res.statusCode = 422;
+      res.send('UserId must be a number bigger than "0"');
+      return;
+    }
+    const foundedUser = await client.query(`
+      SELECT * FROM users
+      WHERE users.id = $1
+    `, [Number(userId)]);
+
+    if (foundedUser.rows.length === 0) {
+      res.statusCode = 404;
+      res.send('UserId not found');
+      return;
+    }
+
+    const profile_id = foundedUser.rows[0].profile_id;
+
+    await client.query(`
+      DELETE FROM users
+      WHERE id = $1;
+    `, [Number(userId)]);
+
+    await client.query(`
+      DELETE FROM profiles
+      WHERE id = $1;
+    `, [profile_id]);
+
+    res.sendStatus(204);
+  } catch (err) {
+    res.send(`Something went wrong:( We will fix this problem soon ${err}`);
+  }
+});
+
 
 server.listen(port, () => {
   console.log('server start on port', port);
