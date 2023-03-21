@@ -16,19 +16,34 @@ server.use(cors());
 server.use(express.static(path.resolve('public')));
 server.use(express.json());
 
-server.get('/users', async(req, res) => {
+server.get('/users', async(req, res) => {  
   try {
-    const usersToSend = await client.query(`
-    SELECT
-      users.username,
-      profiles.first_name,
-      profiles.last_name,
-      users.email,
-      users.role,
-      profiles.state
-    FROM users JOIN profiles
-    ON users.profile_id = profiles.id
-    `);
+    const { role } = req.query;
+
+    const usersToSend = role
+      ? await client.query(`
+        SELECT
+          users.username,
+          profiles.first_name,
+          profiles.last_name,
+          users.email,
+          users.role,
+          profiles.state
+        FROM users JOIN profiles
+        ON users.profile_id = profiles.id
+        WHERE users.role = $1
+        `, [role])
+      : await client.query(`
+        SELECT
+          users.username,
+          profiles.first_name,
+          profiles.last_name,
+          users.email,
+          users.role,
+          profiles.state
+        FROM users JOIN profiles
+        ON users.profile_id = profiles.id
+        `);
 
     res.send(usersToSend.rows);
   } catch (err) {
