@@ -76,6 +76,7 @@ server.get('/users/:userId', async(req, res) => {
 
     const foundedUser = await client.query(`
       SELECT
+        users.id,
         users.username,
         profiles.first_name,
         profiles.last_name,
@@ -143,15 +144,14 @@ server.post('/users', async(req, res) => {
     }
 
     res.statusCode = 201;
-      res.send({
-        username,
-        first_name,
-        last_name,
-        email,
-        role,
-        state
-      }
-    );
+    res.send({
+      username,
+      first_name,
+      last_name,
+      email,
+      role,
+      state
+    });
   } catch (err) {
     res.send('Something went wrong:( We will fix this problem soon');
   }
@@ -191,7 +191,88 @@ server.delete('/users/:userId', async(req, res) => {
 
     res.sendStatus(204);
   } catch (err) {
-    res.send(`Something went wrong:( We will fix this problem soon ${err}`);
+    res.send(`Something went wrong:( We will fix this problem soon`);
+  }
+});
+
+server.put('/users/:userId', async(req, res) => {
+  try {
+    const { userId } = req.params;
+
+    if (!Number(userId)) {
+      res.statusCode = 422;
+      res.send('UserId must be a number bigger than "0"');
+      return;
+    }
+
+    const {
+      username,
+      first_name,
+      last_name,
+      email,
+      role,
+      state,
+    } = req.body;
+
+    if (!username
+      || !first_name
+      || !last_name
+      || !email
+      || (role !== 'user' && role !== 'admin')
+      || (state !== 'male' && state !== 'female')
+    ) {
+      res.sendStatus(422);
+      return;
+    }
+
+    const foundedUser = await client.query(`
+      SELECT * FROM users
+      WHERE users.id = $1
+    `, [Number(userId)]);
+
+    if (foundedUser.rows.length === 0) {
+      res.statusCode = 404;
+      res.send('UserId not found');
+      return;
+    }
+
+    const profile_id = foundedUser.rows[0].profile_id;
+
+    await client.query(`
+      UPDATE users
+      SET username = $1,
+          email = $2,
+          role = $3
+      WHERE id = $4;
+    `, [username, email, role, Number(userId)]);
+
+    await client.query(`
+      UPDATE profiles
+      SET first_name = $1,
+          last_name = $2,
+          state = $3
+      WHERE id = $4;
+    `, [first_name, last_name, state, profile_id]);
+
+    const updatedUser = await client.query(`
+      SELECT
+        users.id,
+        users.username,
+        profiles.first_name,
+        profiles.last_name,
+        users.email,
+        users.role,
+        profiles.state
+      FROM users JOIN profiles
+      ON users.profile_id = profiles.id
+      WHERE users.id = $1
+    `, [Number(userId)]);
+
+    res.statusCode = 201;
+    res.send(updatedUser.rows);
+
+  } catch (err) {
+    res.send(`Something went wrong:( We will fix this problem soon`);
   }
 });
 
