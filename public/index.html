@@ -6,9 +6,127 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+
+    main {
+      margin: 0 auto;
+      max-width: 600px;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background-color: rgb(247, 231, 211);
+    }
+
+    h1, h2, h3 {
+      text-align: center;
+      font-size: 22px;
+      line-height: 100%;
+    }
+
+    li {
+      padding: 5px;
+      list-style: none;
+    }
+
+    .conditions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: stretch;
+      justify-content: space-around;
+      align-content:space-around;
+      width: 100%;
+      height: 88%;
+    }
+
+    .requests {
+      width: 45%;
+      background-color: rgb(249, 243, 230);
+      border-radius: 8px;
+    }
+
+    .description {
+      font-size: 14px;
+    }
+  </style>
 </head>
 <body>
-  <h1>Hello!</h1>
-  <h2>It's my express server!)</h2>
+  <main>
+    <h1>Hello!</h1>
+    <h2>Welcome to my REST API</h2>
+    <ul class="conditions">
+      <li class="requests">
+        <h3 class="title">GET</h3>
+          <ul class="description">
+            <li>
+              <strong>".../users"</strong> to get an array of users in JSON format.
+            </li>
+            <li>
+              <strong>".../users?role=admin"</strong> or <strong>"...role=user"</strong> to get users corresponding to the role.
+            </li>
+            <li>
+              <strong>".../users/user_id"</strong> to get one user. User_id must be a number bigger than 0.
+            </li>
+          </ul>
+      </li>
+
+      <li class="requests">
+        <h3 class="title">POST</h3>
+        <ul class="description">
+          <li>
+            Send the <strong>POST</strong> request to <strong>".../users"</strong> to create a new user.
+          </li>
+          <li>
+            Request body must be an object with the next fields: <br>
+            <pre>
+  {
+    username: string,
+    first_name: string,
+    last_name: string,
+    email: string,
+    role: 'user' | 'admin',
+    state: 'male' | 'female'
+  }
+            </pre>
+          </li>
+        </ul>
+      </li>
+
+      <li class="requests">
+        <h3 class="title">PUT</h3>
+        <ul class="description">
+          <li>
+            Send the <strong>PUT</strong> request to <strong>".../users/user_id"</strong> to update the user.
+          </li>
+          <li>
+            Request body must be an object with the next fields: <br>
+            <pre>
+  {
+    username: string,
+    first_name: string,
+    last_name: string,
+    email: string,
+    role: 'user' | 'admin',
+    state: 'male' | 'female'
+  }
+            </pre>
+          </li>
+        </ul>
+      </li>
+      
+      <li class="requests">
+        <h3 class="title">DELETE</h3>
+        <ul class="description">
+          <li>
+            Send the <strong>DELETE</strong> request to <strong>".../users/user_id"</strong> to delete the user.
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </main>
 </body>
 </html>
