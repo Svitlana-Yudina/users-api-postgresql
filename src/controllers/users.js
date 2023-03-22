@@ -1,4 +1,5 @@
 import * as userServices from '../services/users.js';
+import { isUserValid } from '../utils/checks.js';
 
 export const hasRole = (req, res, next) => {
   const { role } = req.query;
@@ -64,35 +65,13 @@ export const getOne = async(req, res) => {
 
 export const create = async(req, res) => {
   try {
-    const {
-      username,
-      first_name,
-      last_name,
-      email,
-      role,
-      state,
-    } = req.body;
-
-    if (!username
-      || !first_name
-      || !last_name
-      || !email
-      || (role !== 'user' && role !== 'admin')
-      || (state !== 'male' && state !== 'female')
-    ) {
+    if (!isUserValid(req.body)) {
       res.sendStatus(422);
 
       return;
     }
 
-    const createdUser = await userServices.createNewUser({
-      username,
-      first_name,
-      last_name,
-      email,
-      role,
-      state,
-    });
+    const createdUser = await userServices.createNewUser(req.body);
 
     res.statusCode = 201;
     res.send(createdUser);
@@ -138,22 +117,7 @@ export const update = async(req, res) => {
       return;
     }
 
-    const {
-      username,
-      first_name,
-      last_name,
-      email,
-      role,
-      state,
-    } = req.body;
-
-    if (!username
-      || !first_name
-      || !last_name
-      || !email
-      || (role !== 'user' && role !== 'admin')
-      || (state !== 'male' && state !== 'female')
-    ) {
+    if (!isUserValid(req.body)) {
       res.sendStatus(422);
       return;
     }
@@ -171,14 +135,7 @@ export const update = async(req, res) => {
     const updatedUser = await userServices.update(
       userId,
       profile_id,
-      {
-        username,
-        first_name,
-        last_name,
-        email,
-        role,
-        state,
-      });
+      req.body);
 
     res.statusCode = 201;
     res.send(updatedUser);
