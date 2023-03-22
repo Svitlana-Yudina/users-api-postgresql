@@ -1,5 +1,15 @@
 import * as userServices from '../services/users.js';
 
+export const hasRole = (req, res, next) => {
+  const { role } = req.query;
+
+  if (role !== undefined) {
+    next();
+  } else {
+    next('route');
+  }
+};
+
 export const getAll = async(req, res) => {
   try {
     const allUsers = await userServices.getAll();
