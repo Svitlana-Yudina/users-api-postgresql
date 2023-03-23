@@ -7,13 +7,12 @@ services:
     depends_on:
       - db
     environment:
-      DATABASE_URL: postgres://qcewziyl:E4tFnzlQHFhd_aLwuFHfWGuH7fXPZGTk@trumpet.db.elephantsql.com/qcewziyl
-      NODE_ENV: development
+#      NODE_ENV: development
       DB_PORT: 5432
       DB_HOST: db
-      DB_USER: qcewziyl
-      DB_PASSWORD: E4tFnzlQHFhd_aLwuFHfWGuH7fXPZGTk
-      DB_NAME: qcewziyl
+      DB_USER: pgtest
+      DB_PASSWORD: pgtest123
+      DB_NAME: pgtest
       PORT: 5000
     links:
       - db
@@ -25,10 +24,15 @@ services:
       - /app/node_modules
 
   db:
-    image: postgres:11
+    image: postgres:14.1-alpine
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_USER: qcewziyl
-      POSTGRES_PASSWORD: E4tFnzlQHFhd_aLwuFHfWGuH7fXPZGTk
-      POSTGRES_DB: qcewziyl
+      POSTGRES_USER: pgtest
+      POSTGRES_PASSWORD: pgtest123
+    volumes: 
+      - db:/var/lib/postgresql/data
+      - ./db:/docker-entrypoint-initdb.d
+volumes:
+  db:
+    driver: local

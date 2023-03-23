@@ -1,13 +1,8 @@
-import pkg from 'pg';
-
-const { Client } = pkg;
-const client = new Client('postgres://qcewziyl:E4tFnzlQHFhd_aLwuFHfWGuH7fXPZGTk@trumpet.db.elephantsql.com/qcewziyl');
-
-await client.connect();
+import {query} from './db.js';
 
 export async function getAll() {
   try {
-    const allUsers = await client.query(`
+    const allUsers = await query(`
           SELECT
             users.id,
             users.username,
@@ -21,7 +16,7 @@ export async function getAll() {
           ORDER BY users.id
         `);
 
-    return allUsers.rows;
+    return allUsers;
   } catch (err) {
     throw new Error(`Something went wrong:( ${err}`);
   }
@@ -29,7 +24,7 @@ export async function getAll() {
 
 export async function getByRole(role) {
   try {
-    const usersToSend = await client.query(`
+    const usersToSend = await query(`
           SELECT
             users.id,
             users.username,
@@ -43,7 +38,7 @@ export async function getByRole(role) {
           WHERE users.role = $1
           ORDER BY users.id
         `, [role]);
-    return usersToSend.rows;
+    return usersToSend;
   } catch (err) {
     throw new Error(`Something went wrong:( ${err}`);
   }
@@ -51,7 +46,7 @@ export async function getByRole(role) {
 
 export async function getById(id) {
   try {
-    const foundedUser = await client.query(`
+    const foundedUser = await query(`
     SELECT
       users.id,
       users.username,
@@ -65,7 +60,7 @@ export async function getById(id) {
     WHERE users.id = $1
   `, [Number(id)]);
 
-  return foundedUser.rows[0];
+  return foundedUser[0];
   } catch (err) {
     throw new Error(`Something went wrong:( ${err}`);
   }
@@ -80,24 +75,24 @@ export async function createNewUser({
   state,
 }) {
   try {
-    const newProfile_id = await client.query(`
+    const newProfile_id = await query(`
       INSERT INTO public.profiles (
       first_name, last_name, state
       ) VALUES ($1, $2, $3)
       returning id`, [first_name, last_name, state]);
 
-    const profile_id = newProfile_id.rows[0].id;
+    const profile_id = newProfile_id[0].id;
 
-    const newUserId = await client.query(`
+    const newUserId = await query(`
       INSERT INTO public.users (
         username, email, role, profile_id
       ) VALUES ($1, $2, $3, $4)
       returning id`, [username, email, role, profile_id]
     );
 
-    const user_id = newUserId.rows[0].id;
+    const user_id = newUserId[0].id;
 
-    const createdUser = await client.query(`
+    const createdUser = await query(`
       SELECT
         users.id,
         users.username,
@@ -111,7 +106,7 @@ export async function createNewUser({
       WHERE users.id = $1
     `, [user_id]);
 
-    return createdUser.rows[0];
+    return createdUser[0];
   } catch (err) {
     throw new Error(`Something went wrong:( ${err}`);
   }
@@ -119,12 +114,12 @@ export async function createNewUser({
 
 export async function findUserInDB(id) {
   try {
-    const foundedUser = await client.query(`
+    const foundedUser = await query(`
       SELECT * FROM users
       WHERE users.id = $1
     `, [Number(id)]);
 
-    return foundedUser.rows[0];
+    return foundedUser[0];
   } catch (err) {
     throw new Error(`Something went wrong:( ${err}`);
   }
@@ -132,12 +127,12 @@ export async function findUserInDB(id) {
 
 export async function remove(id, profId) {
   try {
-    await client.query(`
+    await query(`
       DELETE FROM users
       WHERE id = $1;
     `, [Number(id)]);
 
-    await client.query(`
+    await query(`
       DELETE FROM profiles
       WHERE id = $1;
     `, [profId]);
@@ -157,7 +152,7 @@ export async function update(id, profId, user) {
       state,
     } = user;
 
-    await client.query(`
+    await query(`
       UPDATE users
       SET username = $1,
           email = $2,
@@ -165,7 +160,7 @@ export async function update(id, profId, user) {
       WHERE id = $4;
     `, [username, email, role, Number(id)]);
 
-    await client.query(`
+    await query(`
       UPDATE profiles
       SET first_name = $1,
           last_name = $2,
@@ -173,7 +168,7 @@ export async function update(id, profId, user) {
       WHERE id = $4;
     `, [first_name, last_name, state, profId]);
 
-    const updatedUser = await client.query(`
+    const updatedUser = await query(`
       SELECT
         users.id,
         users.username,
@@ -187,7 +182,7 @@ export async function update(id, profId, user) {
       WHERE users.id = $1
     `, [Number(id)]);
 
-    return updatedUser.rows[0];
+    return updatedUser[0];
 
   } catch (err) {
     throw new Error(`Something went wrong:( ${err}`);

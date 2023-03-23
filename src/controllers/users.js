@@ -17,7 +17,7 @@ export const getAll = async(req, res) => {
       
     res.send(allUsers);
   } catch (err) {
-    res.send('Something went wrong:( We will fix this problem soon');
+    res.send(`Something went wrong:( error is - ${err}`);
   }
 };
 
