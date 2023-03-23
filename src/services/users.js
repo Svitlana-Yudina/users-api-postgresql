@@ -1,13 +1,11 @@
-import pkg from 'pg';
-
-const { Client } = pkg;
-const client = new Client('postgres://qcewziyl:E4tFnzlQHFhd_aLwuFHfWGuH7fXPZGTk@trumpet.db.elephantsql.com/qcewziyl');
-
-await client.connect();
+import {query} from './db.js';
 
 export async function getAll() {
   try {
-    const allUsers = await client.query(`
+    // const allUsers = await query(`
+    // SELECT table_name FROM INFORMATION_SCHEMA.TABLES
+    // `);
+    const allUsers = await query(`
           SELECT
             users.id,
             users.username,
@@ -20,8 +18,39 @@ export async function getAll() {
           ON users.profile_id = profiles.id
           ORDER BY users.id
         `);
+    // const all = await query(`
+    // SELECT * FROM INFORMATION_SCHEMA.TABLES
+    // `);
+    // console.log('user', all);
+    // const users = await query(`
+    // SELECT * FROM INFORMATION_SCHEMA.TABLES
+    // where table_name = 'users';
+    // `);
+    // console.log('user', users);
+    // const prof = await query(`
+    // SELECT * FROM INFORMATION_SCHEMA.TABLES
+    // where table_name = 'profiles';
+    // `);
+    // console.log('prof', prof);
+    
+    // const userSel = await query(`
+    // SELECT * FROM users;
+    // `);
+    // console.log('userSel', userSel);
+    // const userSelPub = await query(`
+    // SELECT * FROM public.users;
+    // `);
+    // console.log('userSelPub', userSelPub);
+    // const profSel = await query(`
+    // SELECT * FROM profiles;
+    // `);
+    // console.log('profSel', profSel);
+    // const profSelPub = await query(`
+    // SELECT * FROM public.profiles;
+    // `);
+    // console.log('profSelPub', profSelPub);
 
-    return allUsers.rows;
+    return allUsers;
   } catch (err) {
     throw new Error(`Something went wrong:( ${err}`);
   }
@@ -29,7 +58,7 @@ export async function getAll() {
 
 export async function getByRole(role) {
   try {
-    const usersToSend = await client.query(`
+    const usersToSend = await query(`
           SELECT
             users.id,
             users.username,
@@ -43,7 +72,7 @@ export async function getByRole(role) {
           WHERE users.role = $1
           ORDER BY users.id
         `, [role]);
-    return usersToSend.rows;
+    return usersToSend;
   } catch (err) {
     throw new Error(`Something went wrong:( ${err}`);
   }
@@ -51,7 +80,7 @@ export async function getByRole(role) {
 
 export async function getById(id) {
   try {
-    const foundedUser = await client.query(`
+    const foundedUser = await query(`
     SELECT
       users.id,
       users.username,
@@ -65,7 +94,7 @@ export async function getById(id) {
     WHERE users.id = $1
   `, [Number(id)]);
 
-  return foundedUser.rows[0];
+  return foundedUser[0];
   } catch (err) {
     throw new Error(`Something went wrong:( ${err}`);
   }
